@@ -1,13 +1,17 @@
 package config
 
+import (
+    "fmt"
+)
+
 type Handler interface {
     Set(key string, val string) error
-    String(key, def string) (string, error)
-    Strings(key string, def []string) (string, error)
-    Int(key string, def int) (int, error)
-    Int64(key string, def int64) (int64, error)
-    Bool(key string, def bool) (bool, error)
-    Float(key string, def float64) (float64, error)
+    String(key, def string) string
+    Strings(key string, def []string) []string
+    Int(key string, def int) int
+    Int64(key string, def int64) int64
+    Bool(key string, def bool) bool
+    Float(key string, def float64) float64
 }
 
 type Config interface {
@@ -25,4 +29,12 @@ func Register(name string, adapter Config) {
         panic("config: Register called twice for adapter " + name)
     }
     adapters[name] = adapter
+}
+
+func NewConfig(adapterName, filename string) (Handler, error) {
+    if adapter, ok := adapters[adapterName]; ok {
+        return adapter.Reader(filename)
+    } else {
+        return nil, fmt.Errorf("config: unknown adapter %q", adapterName)
+    }
 }
