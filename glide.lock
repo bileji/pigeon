@@ -1,8 +1,8 @@
-hash: 18d17f7f5c972c0fc5d7d5d7aac2c20fe17953c1dd85c6770d62001292f6d3a0
-updated: 2016-09-06T11:35:19.938588569+08:00
+hash: f749015a51ddcb4fef81c0354cd26a94e34d5849262b14a1a16e02eaed6f7c17
+updated: 2016-09-06T11:59:33.317179644+08:00
 imports:
 - name: github.com/bileji/pigeon
-  version: 45b15fca79dd20d762b4e4df138119652bcebf6b
+  version: 4106a0dbe165be18774671399256ec3077025977
   subpackages:
   - libary/config
 - name: gopkg.in/yaml.v2
