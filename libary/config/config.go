@@ -24,4 +24,5 @@ func Register(name string, adapter Config) {
     if _, ok := adapters[name]; ok == true {
         panic("config: Register called twice for adapter " + name)
     }
+    adapters[name] = adapter
 }

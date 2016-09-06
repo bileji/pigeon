@@ -3,6 +3,9 @@ package yaml
 import (
     "sync"
     "os"
+    "fmt"
+    "path"
+    "time"
     "io/ioutil"
     "gopkg.in/yaml.v2"
     "github.com/bileji/pigeon/libary/config"
@@ -28,9 +31,13 @@ func (yaml *Config) Reader(filename string) (handler config.Handler, err error) 
 }
 
 // 写入数据
-func (yaml *Config) Writer(data []byte) (handler config.Handler, err error)  {
-    // todo
-    return
+func (yaml *Config) Writer(data []byte) (config.Handler, error) {
+    tmpName := path.Join(os.TempDir(), "pigeon", fmt.Sprintf("%d", time.Now().Nanosecond()))
+    os.MkdirAll(path.Dir(tmpName), os.ModePerm)
+    if err := ioutil.WriteFile(tmpName, data, 0655); err != nil {
+        return nil, err
+    }
+    return yaml.Reader(tmpName)
 }
 
 // 读取yaml数据
@@ -50,4 +57,8 @@ func ReadYaml(filename string) (data map[string]interface{}, err error) {
         return nil, err
     }
     return
+}
+
+func init() {
+    config.Register("yaml", &Config{})
 }
