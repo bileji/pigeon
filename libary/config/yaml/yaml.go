@@ -129,7 +129,7 @@ func ReadYaml(filename string) (data map[string]interface{}, err error) {
     if err != nil {
         return nil, err
     }
-    return
+    return config.EnvValueForMap(data)
 }
 
 func init() {

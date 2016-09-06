@@ -1,7 +1,9 @@
 package config
 
 import (
+    "os"
     "fmt"
+    "regexp"
 )
 
 type Handler interface {
@@ -37,4 +39,41 @@ func NewConfig(adapterName, filename string) (Handler, error) {
     } else {
         return nil, fmt.Errorf("config: unknown adapter %q", adapterName)
     }
+}
+
+func EnvValue(name string) string {
+    match := regexp.MustCompile(`^\$\{([a-zA-Z_][\w]+)(\|\|[./\w]*)}$`).FindAllStringSubmatch(name, -1)
+    if len(match) > 0 {
+        switch true {
+        case match[0] > 2:
+            val := os.Getenv(match[1])
+            if val != "" {
+                return val
+            }
+            return match[2]
+        case match[0] > 1:
+            val := os.Getenv(match[1])
+            if val != "" {
+                return val
+            }
+        }
+    }
+    return name
+}
+
+func EnvValueForMap(m map[string]interface{}) map[string]interface{} {
+    for k, v := range m {
+        switch value := v.(type) {
+        case string:
+            m[k] = EnvValue(value)
+        case map[string]interface{}:
+            m[k] = EnvValueForMap(value)
+        case map[string]string:
+            for k2, v2 := range value {
+                value[k2] = EnvValue(v2)
+            }
+            m[k] = value
+        }
+    }
+    return m
 }
