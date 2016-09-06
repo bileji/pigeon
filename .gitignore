@@ -1,3 +1,6 @@
 .idea
 vendor
 glide.lock
+config/
+scripte/
+storage/
