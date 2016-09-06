@@ -1,5 +1,4 @@
 package: pigeon
-import: [
-  "gopkg.in/yaml.v2",
-  "github.com/bileji/pigeon/libary/config"
-]
+import:
+  - package: gopkg.in/yaml.v2
+  - package: github.com/bileji/pigeon
