@@ -1,4 +1,4 @@
 package: pigeon
 import:
   - package: gopkg.in/yaml.v2
-  - package: github.com/bileji/pigeon
+  - package: github.com/pigeongo/config

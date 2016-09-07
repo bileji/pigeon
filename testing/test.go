@@ -1,10 +1,11 @@
 package main
 
 import (
+    "os"
     "fmt"
-    //"github.com/bileji/pigeon/libary/config"
-    "github.com/bileji/pigeon/libary/config/yaml"
-    //"encoding/json"
+    "log"
+    "github.com/pigeongo/config"
+    "github.com/pigeongo/config/yaml"
 )
 
 var C yaml.Config
@@ -22,6 +23,13 @@ func main() {
         //fmt.Println(handler.Slice("test1", *new([]interface{})))
         fmt.Println(handler.Slice("gade", *new([]interface{})))
     }
+
+    h1, err := config.NewConfig("yaml", "./config/gate.yaml")
+    fmt.Println(h1.Slice("gade", *new([]interface{})))
+
+    file, _ := os.Getwd()
+    log.Println("current path:", file)
+
 
     //bytes, _ := json.Marshal(&Data{Name: "shuchao", Age: 22})
     //h, err := C.Writer(bytes)
