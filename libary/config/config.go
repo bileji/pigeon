@@ -4,6 +4,7 @@ import (
     "os"
     "fmt"
     "regexp"
+    "reflect"
 )
 
 type Handler interface {
@@ -14,6 +15,7 @@ type Handler interface {
     Int64(key string, def int64) int64
     Bool(key string, def bool) bool
     Float(key string, def float64) float64
+    Slice(key string, def []interface{}) []interface{}
 }
 
 type Config interface {
@@ -42,17 +44,17 @@ func NewConfig(adapterName, filename string) (Handler, error) {
 }
 
 func EnvValue(name string) string {
-    match := regexp.MustCompile(`^\$\{([a-zA-Z_][\w]+)(\|\|[./\w]*)}$`).FindAllStringSubmatch(name, -1)
+    match := regexp.MustCompile(`^\$\{([a-zA-Z_][\w]+)(\|\|[./\w])*}$`).FindAllStringSubmatch(name, -1)
     if len(match) > 0 {
-        switch true {
-        case match[0] > 2:
-            val := os.Getenv(match[1])
+        switch {
+        case len(match[0]) > 2:
+            val := os.Getenv(match[0][1])
             if val != "" {
                 return val
             }
-            return match[2]
-        case match[0] > 1:
-            val := os.Getenv(match[1])
+            return match[0][2]
+        case len(match[0]) > 1:
+            val := os.Getenv(match[0][1])
             if val != "" {
                 return val
             }
@@ -61,18 +63,40 @@ func EnvValue(name string) string {
     return name
 }
 
+func EnvForSlice(s []interface{}) []interface{} {
+    v := reflect.ValueOf(s)
+    tmp := make([]interface{}, v.Len(), v.Len())
+    for i := 0; i < v.Len(); i++ {
+        vv := v.Index(i).Interface()
+        switch vv := vv.(type) {
+        case string:
+            tmp[i] = EnvValue(vv)
+        case []interface{}:
+            tmp[i] = EnvForSlice(vv)
+        case map[interface{}]interface{}:
+            tmpMap := make(map[string]interface{})
+            for key, value := range vv {
+                tmpMap[key.(string)] = value
+            }
+            tmp[i] = EnvValueForMap(tmpMap)
+        }
+    }
+    return tmp
+}
+
 func EnvValueForMap(m map[string]interface{}) map[string]interface{} {
     for k, v := range m {
-        switch value := v.(type) {
+        switch v := v.(type) {
         case string:
-            m[k] = EnvValue(value)
-        case map[string]interface{}:
-            m[k] = EnvValueForMap(value)
-        case map[string]string:
-            for k2, v2 := range value {
-                value[k2] = EnvValue(v2)
+            m[k] = EnvValue(v)
+        case []interface{}:
+            m[k] = EnvForSlice(v)
+        case map[interface{}]interface{}:
+            tmpMap := make(map[string]interface{})
+            for key, value := range v {
+                tmpMap[key.(string)] = value
             }
-            m[k] = value
+            m[k] = EnvValueForMap(tmpMap)
         }
     }
     return m

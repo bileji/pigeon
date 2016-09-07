@@ -1,5 +1,31 @@
 name:
   shuchao
 class:
-  hello
-  world
+  test1: hello
+  test2: world
+  test3: ${GOPATH}
+gade:
+  -
+    h1: t4
+    h2: rt
+  -
+    h1: t4
+    h2: rt
+  -
+    h1: t4
+    h2: rt
+test:
+  - s
+  - b
+test1:
+  -
+    - tt
+    - hh
+    - aa
+  -
+    - ss
+    - bb
+rank:
+  h1:
+    g1: hi
+    g2: n1

@@ -8,6 +8,7 @@ import (
     "time"
     "strings"
     "io/ioutil"
+    "reflect"
     "gopkg.in/yaml.v2"
     "github.com/bileji/pigeon/libary/config"
     "github.com/wendal/errors"
@@ -20,11 +21,36 @@ type Container struct {
     sync.Mutex
 }
 
+// 支持循环取值
+func valueCycle(keys []string, data interface{}) interface{} {
+    for num, key := range keys {
+        if tmp := reflect.ValueOf(data).MapIndex(reflect.ValueOf(key)); !tmp.IsValid() {
+            return nil
+        } else {
+            if cur := tmp.Interface(); cur != "" && num == len(keys) - 1 {
+                switch cur.(type) {
+                case int, int64, float64, string, bool, []interface{}:
+                    return cur;
+                default:
+                    return nil
+                }
+            } else {
+                switch cur.(type) {
+                case map[string]interface{}:
+                    return valueCycle(keys[num + 1:], cur)
+                }
+            }
+        }
+    }
+    return nil
+}
+
 func (c *Container) Get(key string) (interface{}, error) {
     if len(key) == 0 {
         return nil, errors.New("key is empty")
     }
-    if val, ok := c.data[key]; ok {
+
+    if val := valueCycle(strings.Split(key, "."), c.data); val != nil {
         return val, nil
     }
     return nil, fmt.Errorf("not exist key %q", key)
@@ -91,6 +117,15 @@ func (c *Container) Float(key string, def float64) float64 {
     return def
 }
 
+func (c *Container) Slice(key string, def []interface{}) []interface{} {
+    if val, err := c.Get(key); err == nil {
+        if v, ok := val.([]interface{}); ok {
+            return v
+        }
+    }
+    return def
+}
+
 // 读取数据
 func (yaml *Config) Reader(filename string) (handler config.Handler, err error) {
     data, err := ReadYaml(filename)
@@ -129,7 +164,8 @@ func ReadYaml(filename string) (data map[string]interface{}, err error) {
     if err != nil {
         return nil, err
     }
-    return config.EnvValueForMap(data)
+    data = config.EnvValueForMap(data)
+    return
 }
 
 func init() {
