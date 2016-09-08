@@ -1,0 +1,13 @@
+master:
+  host: 127.0.0.1
+  port: 32000
+slave:
+  -
+    host: 127.0.0.1
+    port: 32100
+  -
+    host: 127.0.0.1
+    port: 32200
+  -
+    host: 127.0.0.1
+    port: 32300
