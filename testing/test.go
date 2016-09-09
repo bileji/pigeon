@@ -16,7 +16,7 @@ type Data struct {
 }
 
 func main() {
-    handler, err := C.Reader("./config/gateway.yaml")
+    handler, err := C.Reader("./config/dispatcher.yaml")
     if err != nil {
         fmt.Println(err)
     } else {
@@ -24,7 +24,7 @@ func main() {
         fmt.Println(handler.Slice("gade", *new([]interface{})))
     }
 
-    h1, err := config.NewConfig("yaml", "./config/gateway.yaml")
+    h1, err := config.NewConfig("yaml", "./config/dispatcher.yaml")
     fmt.Println(h1.Slice("gade", *new([]interface{})))
 
     file, _ := os.Getwd()

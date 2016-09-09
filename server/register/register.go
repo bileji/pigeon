@@ -14,13 +14,13 @@ import (
 func main() {
     // 自定义Usage
     flag.Usage = func() {
-        fmt.Fprintln(os.Stderr, "Usage: session-server [cmd [arg [arg ...]]]")
+        fmt.Fprintln(os.Stderr, "Usage: register-server [cmd [arg [arg ...]]]")
         flag.PrintDefaults()
     }
     // UDP监听端口
     port := flag.Int("p", 32000, "specifies the listener port")
     // 日志文件保存位置
-    logPath := flag.String("l", "/data/logs/session.log", "log file save location")
+    logPath := flag.String("l", "/data/logs/register.log", "log file save location")
     flag.Parse()
 
     log.Println(*port)
